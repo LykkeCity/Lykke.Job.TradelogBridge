@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+	<Version>1.0.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Lykke.Common" Version="4.1.0" />
+    <PackageReference Include="Lykke.Job.TradesConverter.Contract" Version="1.0.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Lykke.Job.TradelogBridge.Core\Lykke.Job.TradelogBridge.Core.csproj" />
+    <ProjectReference Include="..\Lykke.Job.TradelogBridge.Sql\Lykke.Job.TradelogBridge.Sql.csproj" />
+  </ItemGroup>
+
+</Project>
