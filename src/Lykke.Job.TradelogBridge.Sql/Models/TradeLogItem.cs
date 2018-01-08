@@ -40,7 +40,7 @@ namespace Lykke.Job.TradelogBridge.Sql.Models
 
         public TradeLogItemFee FeeInstruction { get; set; }
 
-        public override object DbId => Id;
+        public override object DbId => Guid.NewGuid();
 
         public override bool Update(object newVersion, DbContext context)
         {
