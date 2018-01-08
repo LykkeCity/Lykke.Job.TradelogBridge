@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="Lykke.Common" Version="4.1.0" />
-    <PackageReference Include="Lykke.Service.DataBridge.Data" Version="1.2.0" />
+    <PackageReference Include="Lykke.Service.DataBridge.Data" Version="1.2.1" />
   </ItemGroup>
 
 </Project>

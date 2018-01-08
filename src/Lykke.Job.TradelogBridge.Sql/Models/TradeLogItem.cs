@@ -1,8 +1,10 @@
 ﻿using System;
+using Lykke.Service.DataBridge.Data.Abstractions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Lykke.Job.TradelogBridge.Sql.Models
 {
-    public class TradeLogItem
+    public class TradeLogItem : DbIdentityBase
     {
         public static int MaxStringFieldsLength { get { return 255; } }
 
@@ -37,5 +39,21 @@ namespace Lykke.Job.TradelogBridge.Sql.Models
         public bool? IsHidden { get; set; }
 
         public TradeLogItemFee FeeInstruction { get; set; }
+
+        public override object DbId => Id;
+
+        public override bool Update(object newVersion, DbContext context)
+        {
+            var item = newVersion as TradeLogItem;
+            if (item == null)
+                return false;
+
+            if (IsHidden == item.IsHidden)
+                return false;
+
+            IsHidden = item.IsHidden;
+
+            return true;
+        }
     }
 }
