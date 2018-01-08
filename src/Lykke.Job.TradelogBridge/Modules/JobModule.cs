@@ -62,11 +62,11 @@ namespace Lykke.Job.TradelogBridge.Modules
                 blobStorage,
                 blobsCheckPeriodInSeconds: 3,
                 warningPeriodInMinutes: 10,
-                _settings.WarningSqlTableSizeInGigabytes,
+                warningSqlTableSizeInGigabytes: _settings.WarningSqlTableSizeInGigabytes,
                 batchPeriodInMilliseconds: _settings.BatchPeriodInSeconds * 1000,
-                _log,
-                new DbContextExtFactory(),
-                new DbEntityMapper());
+                log: _log,
+                dbContextFatory: new DbContextExtFactory(),
+                entityMapper: new DbEntityMapper());
             builder
                 .RegisterInstance(repository)
                 .As<IStartable>()
