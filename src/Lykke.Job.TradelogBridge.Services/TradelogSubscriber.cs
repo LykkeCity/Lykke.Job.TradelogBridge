@@ -61,7 +61,7 @@ namespace Lykke.Job.TradelogBridge.Services
             }
             catch (Exception exc)
             {
-                await _log.WriteErrorAsync(nameof(TradelogSubscriber), nameof(ProcessMessageAsync), exc);
+                await _log.WriteErrorAsync("TradelogSubscriber.ProcessMessageAsync", arg.ToJson(), exc);
             }
         }
 
