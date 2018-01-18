@@ -29,7 +29,6 @@
   <ItemGroup>
     <PackageReference Include="Lykke.Common.ApiLibrary" Version="1.1.0" />
     <!-- #if azurequeuesub -->
-    <PackageReference Include="Lykke.JobTriggers" Version="1.2.0" />
     <!-- #endif -->
     <PackageReference Include="Lykke.Logs" Version="3.5.1" />
     <!-- #if rabbitpub -->
@@ -39,6 +38,7 @@
     <!-- #endif -->
     <PackageReference Include="Lykke.SettingsReader" Version="1.1.4" />
     <PackageReference Include="Lykke.SlackNotification.AzureQueue" Version="2.0.1" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics" Version="2.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="2.0.1" />
