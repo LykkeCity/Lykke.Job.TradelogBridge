@@ -6,7 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Lykke.Common" Version="4.1.0" />
     <PackageReference Include="Lykke.Job.TradesConverter.Contract" Version="1.0.7" />
   </ItemGroup>
 
