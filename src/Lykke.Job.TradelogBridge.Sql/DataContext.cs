@@ -8,7 +8,7 @@ namespace Lykke.Job.TradelogBridge.Sql
 {
     public class DataContext : DbContextExt
     {
-        private const string _tradesTableName = "Trades";
+        internal const string TradesTable = "Trades";
 
         public virtual DbSet<TradeLogItem> Trades { get; set; }
 
@@ -24,7 +24,7 @@ namespace Lykke.Job.TradelogBridge.Sql
 
         public override List<string> GetTableNames(Type type)
         {
-            return new List<string>(1) { _tradesTableName };
+            return new List<string>(1) { TradesTable };
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -47,7 +47,7 @@ namespace Lykke.Job.TradelogBridge.Sql
                 entity.Property(e => e.OppositeVolume).HasColumnType("decimal(18,8)");
                 entity.Property(e => e.IsHidden).HasColumnType("bit");
                 entity.HasOne(e => e.FeeInstruction).WithOne().HasForeignKey<TradeLogItemFee>(i => i.TradeLogItemId);
-                entity.ToTable(_tradesTableName);
+                entity.ToTable(TradesTable);
             });
 
             modelBuilder.Entity<TradeLogItemFee>(entity =>

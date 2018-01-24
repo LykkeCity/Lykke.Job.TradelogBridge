@@ -64,7 +64,8 @@ namespace Lykke.Job.TradelogBridge.Modules
                 batchPeriodInMilliseconds: _settings.BatchPeriodInSeconds * 1000,
                 log: _log,
                 dbContextFatory: new DbContextExtFactory(),
-                entityMapper: new DbEntityMapper());
+                entityMapper: new DbEntityMapper(),
+                notIdentifiableItemsProcessor: new TradesProcessor());
             builder
                 .RegisterInstance(repository)
                 .As<IStartable>()

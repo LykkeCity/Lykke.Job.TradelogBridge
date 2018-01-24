@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Lykke.Service.DataBridge.Data" Version="1.2.6" />
+    <PackageReference Include="Lykke.Service.DataBridge.Data" Version="2.1.0" />
   </ItemGroup>
 
 </Project>
