@@ -11,8 +11,8 @@ namespace Lykke.Job.TradelogBridge.Sql
     public class TradesProcessor : INotIdentifiableItemsProcessor
     {
         private const string _format = "yyyy-MM-dd";
-        private static DateTime _cacheDate = DateTime.MinValue;
-        private static Dictionary<string, List<TradeLogItem>> _dict;
+        private readonly Dictionary<string, List<TradeLogItem>> _dict = new Dictionary<string, List<TradeLogItem>>();
+        private DateTime _cacheDate = DateTime.MinValue;
 
         public async Task AddToContextAsync(object item, DbContextExt context)
         {
@@ -31,26 +31,19 @@ namespace Lykke.Job.TradelogBridge.Sql
             if (_dict == null
                 || _dict.Count == 0 && item.DateTime.Date != _cacheDate
                 || _dict.Count > 0 && _dict.First().Value.First().DateTime.Date != item.DateTime.Date)
-                InitCache(item, dbContext);
+            {
+                _dict.Clear();
+                _cacheDate = item.DateTime.Date;
+            }
 
-            if (!_dict.ContainsKey(item.TradeId))
-                return false;
+            string query = $"SELECT * FROM dbo.{DataContext.TradesTable} WHERE TradeId = '{item.TradeId}'";
+            var items = dbContext.Trades.FromSql(query).ToList();
+            _dict[item.TradeId] = items;
 
             var fromDb = _dict[item.TradeId].FirstOrDefault(c =>
                 c.WalletId == item.WalletId
-                && c.Asset == item.Asset
-                && c.OppositeAsset == item.OppositeAsset);
+                && c.Asset == item.Asset);
             return fromDb != null;
-        }
-
-        private static void InitCache(TradeLogItem item, DataContext context)
-        {
-            DateTime from = item.DateTime.Date;
-            DateTime to = from.AddDays(1);
-            string query = $"SELECT * FROM dbo.{DataContext.TradesTable} WHERE TradeId = '{item.TradeId}'";
-            var items = context.Trades.FromSql(query).ToList();
-            _dict[item.TradeId] = items;
-            _cacheDate = from;
         }
     }
 }
