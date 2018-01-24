@@ -36,9 +36,12 @@ namespace Lykke.Job.TradelogBridge.Sql
                 _cacheDate = item.DateTime.Date;
             }
 
-            string query = $"SELECT * FROM dbo.{DataContext.TradesTable} WHERE TradeId = '{item.TradeId}'";
-            var items = dbContext.Trades.FromSql(query).ToList();
-            _dict[item.TradeId] = items;
+            if (!_dict.ContainsKey(item.TradeId))
+            {
+                string query = $"SELECT * FROM dbo.{DataContext.TradesTable} WHERE TradeId = '{item.TradeId}'";
+                var items = dbContext.Trades.FromSql(query).ToList();
+                _dict[item.TradeId] = items;
+            }
 
             var fromDb = _dict[item.TradeId].FirstOrDefault(c =>
                 c.WalletId == item.WalletId
