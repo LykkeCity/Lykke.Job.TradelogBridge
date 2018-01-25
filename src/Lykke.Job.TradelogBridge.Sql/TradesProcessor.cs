@@ -42,11 +42,15 @@ namespace Lykke.Job.TradelogBridge.Sql
                 var items = dbContext.Trades.FromSql(query).ToList();
                 _dict[item.TradeId] = items;
             }
-
             var fromDb = _dict[item.TradeId].FirstOrDefault(c =>
                 c.WalletId == item.WalletId
                 && c.Asset == item.Asset);
-            return fromDb != null;
+            if (fromDb == null)
+            {
+                _dict[item.TradeId].Add(item);
+                return false;
+            }
+            return true;
         }
     }
 }

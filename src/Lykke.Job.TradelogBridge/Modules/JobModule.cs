@@ -1,4 +1,5 @@
-﻿using Autofac;
+﻿using System;
+using Autofac;
 using Common.Log;
 using AzureStorage.Blob;
 using Lykke.SettingsReader;
