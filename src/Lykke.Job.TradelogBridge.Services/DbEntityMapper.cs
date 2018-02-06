@@ -6,7 +6,7 @@ namespace Lykke.Job.TradelogBridge.Services
 {
     public class DbEntityMapper : IDbEntityMapper
     {
-        public async Task<object> MapEntityAsync(object item)
+        public Task<object> MapEntityAsync(object item)
         {
             if (item is TradesConverter.Contract.TradeLogItem model)
             {
@@ -40,7 +40,7 @@ namespace Lykke.Job.TradelogBridge.Services
                     };
                 item = converted;
             }
-            return item;
+            return Task.FromResult(item);
         }
     }
 }

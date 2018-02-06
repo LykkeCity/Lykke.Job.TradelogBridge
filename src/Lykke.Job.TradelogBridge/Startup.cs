@@ -178,7 +178,7 @@ namespace Lykke.Job.TradelogBridge
 
             if (string.IsNullOrEmpty(dbLogConnectionString))
             {
-                _console.WriteWarningAsync(nameof(Startup), nameof(CreateLogWithSlack), "Table loggger is not inited").Wait();
+                _console.WriteWarningAsync(nameof(Startup), nameof(CreateLogWithSlack), "Table loggger is not inited").GetAwaiter().GetResult();
                 return aggregateLogger;
             }
 

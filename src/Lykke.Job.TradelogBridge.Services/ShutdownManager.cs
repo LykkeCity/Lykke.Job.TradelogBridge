@@ -16,7 +16,7 @@ namespace Lykke.Job.TradelogBridge.Services
             _log = log;
         }
 
-        public async Task StopAsync()
+        public Task StopAsync()
         {
             foreach (var stopSequence in _stopSequences)
             {
@@ -25,6 +25,7 @@ namespace Lykke.Job.TradelogBridge.Services
                     item.Stop();
                 }
             }
+            return Task.CompletedTask;
         }
 
         public void AddStopSequence(params IStopable[] stopSequence)
