@@ -30,13 +30,16 @@ namespace Lykke.Job.TradelogBridge.Services
                 if (model.WalletType == "Trading")
                     converted.WalletId = converted.UserId;
                 if (model.Fee != null)
-                    converted.FeeInstruction = new TradeLogItemFee
+                    converted.Fee = new TradeLogItemFee
                     {
+                        FromClientId = model.Fee.FromClientId,
+                        ToClientId = model.Fee.ToClientId,
+                        DateTime = model.Fee.DateTime,
+                        Volume = (decimal)model.Fee.Volume,
+                        Asset = model.Fee.Asset,
                         Type = model.Fee.Type,
-                        SourceClientId = model.Fee.SourceClientId,
-                        TargetClientId = model.Fee.TargetClientId,
                         SizeType = model.Fee.SizeType,
-                        Size = model.Fee.Size,
+                        Size = model.Fee.Size.HasValue ? (decimal)model.Fee.Size.Value : (decimal?)null,
                     };
                 item = converted;
             }

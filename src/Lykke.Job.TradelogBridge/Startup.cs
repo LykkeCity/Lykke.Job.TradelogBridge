@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -9,6 +10,7 @@ using Autofac.Extensions.DependencyInjection;
 using AzureStorage.Tables;
 using Common.Log;
 using Lykke.Logs;
+using Lykke.Logs.Slack;
 using Lykke.SettingsReader;
 using Lykke.SlackNotification.AzureQueue;
 using Lykke.Common.ApiLibrary.Middleware;
@@ -196,7 +198,10 @@ namespace Lykke.Job.TradelogBridge
                 QueueName = settings.CurrentValue.SlackNotifications.AzureQueue.QueueName
             }, aggregateLogger);
 
-            var slackNotificationsManager = new LykkeLogToAzureSlackNotificationsManager(slackService, _console);
+            var slackNotificationsManager = new LykkeLogToAzureSlackNotificationsManager(
+                slackService,
+                new HashSet<string> { LykkeLogToAzureStorage.ErrorType, LykkeLogToAzureStorage.FatalErrorType, LykkeLogToAzureStorage.MonitorType },
+                _console);
 
             // Creating azure storage logger, which logs own messages to concole log
             var azureStorageLogger = new LykkeLogToAzureStorage(
@@ -207,6 +212,9 @@ namespace Lykke.Job.TradelogBridge
             azureStorageLogger.Start();
 
             aggregateLogger.AddLog(azureStorageLogger);
+
+            var logToSlack = LykkeLogToSlack.Create(slackService, "Bridges", LogLevel.Error | LogLevel.FatalError | LogLevel.Warning);
+            aggregateLogger.AddLog(logToSlack);
 
             return aggregateLogger;
         }

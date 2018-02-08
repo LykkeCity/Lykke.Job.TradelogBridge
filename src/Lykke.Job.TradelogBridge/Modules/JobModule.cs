@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.EntityFrameworkCore;
 using Autofac;
 using Common.Log;
 using AzureStorage.Blob;
@@ -32,6 +33,13 @@ namespace Lykke.Job.TradelogBridge.Modules
 
         protected override void Load(ContainerBuilder builder)
         {
+            var dbContextFactory = new DbContextExtFactory();
+            using (var context = dbContextFactory.CreateInstance(_settings.SqlConnString))
+            {
+                context.Database.SetCommandTimeout(TimeSpan.FromMinutes(15));
+                context.Database.Migrate();
+            }
+
             builder.RegisterInstance(_log)
                 .As<ILog>()
                 .SingleInstance();

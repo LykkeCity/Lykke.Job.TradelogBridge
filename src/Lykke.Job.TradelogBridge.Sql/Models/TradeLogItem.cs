@@ -36,6 +36,6 @@ namespace Lykke.Job.TradelogBridge.Sql.Models
 
         public bool? IsHidden { get; set; }
 
-        public TradeLogItemFee FeeInstruction { get; set; }
+        public TradeLogItemFee Fee { get; set; }
     }
 }

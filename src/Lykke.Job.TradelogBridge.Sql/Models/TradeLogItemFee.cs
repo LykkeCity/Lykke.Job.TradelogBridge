@@ -1,4 +1,6 @@
-﻿namespace Lykke.Job.TradelogBridge.Sql.Models
+﻿using System;
+
+namespace Lykke.Job.TradelogBridge.Sql.Models
 {
     public class TradeLogItemFee
     {
@@ -8,14 +10,20 @@
 
         public long TradeLogItemId { get; set; }
 
+        public string FromClientId { get; set; }
+
+        public string ToClientId { get; set; }
+
+        public DateTime DateTime { get; set; }
+
+        public decimal Volume { get; set; }
+
+        public string Asset { get; set; }
+
         public string Type { get; set; }
-
-        public string SourceClientId { get; set; }
-
-        public string TargetClientId { get; set; }
 
         public string SizeType { get; set; }
 
-        public double? Size { get; set; }
+        public decimal? Size { get; set; }
     }
 }
