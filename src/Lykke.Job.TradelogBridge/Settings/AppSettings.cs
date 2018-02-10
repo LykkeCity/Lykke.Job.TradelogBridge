@@ -1,4 +1,6 @@
-﻿namespace Lykke.Job.TradelogBridge.Settings
+﻿using Lykke.SettingsReader.Attributes;
+
+namespace Lykke.Job.TradelogBridge.Settings
 {
     public class AppSettings
     {
@@ -8,10 +10,13 @@
 
     public class TradelogBridgeSettings
     {
+        [AzureTableCheck]
         public string LogsConnString { get; set; }
 
+        [SqlCheck]
         public string SqlConnString { get; set; }
 
+        [AzureBlobCheck]
         public string BlobStorageConnString { get; set; }
 
         public int MaxBatchCount { get; set; }
@@ -37,6 +42,7 @@
 
     public class RabbitMqSettings
     {
+        [AmqpCheck]
         public string ConnectionString { get; set; }
 
         public string ExchangeName { get; set; }
