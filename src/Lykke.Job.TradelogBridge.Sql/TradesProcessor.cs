@@ -38,7 +38,7 @@ namespace Lykke.Job.TradelogBridge.Sql
             if (!_dict.ContainsKey(item.TradeId))
             {
                 var query = $"SELECT * FROM dbo.{DataContext.TradesTable} WHERE TradeId = '{item.TradeId}'";
-                var items = dbContext.Trades.FromSql(query).ToList();
+                var items = dbContext.Trades.FromSql(query).AsNoTracking().ToList();
                 _dict[item.TradeId] = items;
             }
             var fromDb = _dict[item.TradeId].FirstOrDefault(c =>
@@ -47,7 +47,7 @@ namespace Lykke.Job.TradelogBridge.Sql
             if (fromDb == null)
             {
                 _dict[item.TradeId].Add(item);
-                return Task.FromResult((object)null); ;
+                return Task.FromResult((object)null);
             }
             return Task.FromResult((object)fromDb);
         }
