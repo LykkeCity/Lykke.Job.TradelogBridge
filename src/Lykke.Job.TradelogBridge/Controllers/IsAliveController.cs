@@ -1,9 +1,9 @@
 ﻿using System.Linq;
 using System.Net;
-using Lykke.Job.TradelogBridge.Core.Services;
-using Lykke.Job.TradelogBridge.Models;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using Lykke.Common.Api.Contract.Responses;
+using Lykke.Job.TradelogBridge.Core.Services;
 
 namespace Lykke.Job.TradelogBridge.Controllers
 {

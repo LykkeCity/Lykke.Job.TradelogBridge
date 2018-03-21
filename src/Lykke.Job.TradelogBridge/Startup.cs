@@ -15,8 +15,8 @@ using Lykke.SettingsReader;
 using Lykke.SlackNotification.AzureQueue;
 using Lykke.Common.ApiLibrary.Middleware;
 using Lykke.Common.ApiLibrary.Swagger;
+using Lykke.Common.Api.Contract.Responses;
 using Lykke.Job.TradelogBridge.Core.Services;
-using Lykke.Job.TradelogBridge.Models;
 using Lykke.Job.TradelogBridge.Modules;
 using Lykke.Job.TradelogBridge.Settings;
 

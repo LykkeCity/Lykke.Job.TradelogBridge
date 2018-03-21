@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Autofac;
 using Common.Log;
 using AzureStorage.Blob;
+using Lykke.Common;
 using Lykke.SettingsReader;
 using Lykke.Service.DataBridge.Data;
 using Lykke.Job.TradesConverter.Contract;
@@ -54,6 +55,8 @@ namespace Lykke.Job.TradelogBridge.Modules
 
             builder.RegisterType<StartupManager>()
                 .As<IStartupManager>();
+
+            builder.RegisterResourcesMonitoring(_log);
 
             var shutdownManager = new ShutdownManager(_log);
             builder.RegisterInstance(shutdownManager)
