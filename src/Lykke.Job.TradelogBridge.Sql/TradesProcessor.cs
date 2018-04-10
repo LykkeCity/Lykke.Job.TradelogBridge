@@ -27,8 +27,7 @@ namespace Lykke.Job.TradelogBridge.Sql
             if (!(newObject is TradeLogItem item) || !(context is DataContext dbContext))
                 return Task.FromResult((object)null);
 
-            if (_dict == null
-                || _dict.Count == 0 && item.DateTime.Subtract(_cacheDate) >= _cacheTimeout
+            if (_dict.Count == 0 && item.DateTime.Subtract(_cacheDate) >= _cacheTimeout
                 || _dict.Count > 0 && item.DateTime.Subtract(_dict.First().Value.First().DateTime) >= _cacheTimeout)
             {
                 _dict.Clear();

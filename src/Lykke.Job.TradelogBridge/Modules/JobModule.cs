@@ -58,7 +58,7 @@ namespace Lykke.Job.TradelogBridge.Modules
 
             builder.RegisterResourcesMonitoring(_log);
 
-            var shutdownManager = new ShutdownManager(_log);
+            var shutdownManager = new ShutdownManager();
             builder.RegisterInstance(shutdownManager)
                 .As<IShutdownManager>()
                 .SingleInstance();
