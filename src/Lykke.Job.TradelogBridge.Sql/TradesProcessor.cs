@@ -11,7 +11,7 @@ namespace Lykke.Job.TradelogBridge.Sql
     public class TradesProcessor : INotIdentifiableItemsProcessor
     {
         private readonly Dictionary<string, List<TradeLogItem>> _dict = new Dictionary<string, List<TradeLogItem>>();
-        private readonly TimeSpan _cacheTimeout = TimeSpan.FromHours(1);
+        private readonly TimeSpan _cacheTimeout = TimeSpan.FromMinutes(30);
         private DateTime _cacheDate = DateTime.MinValue;
 
         public async Task AddToContextAsync(object item, DbContextExt context)
