@@ -76,7 +76,7 @@ namespace Lykke.Job.TradelogBridge
             }
             catch (Exception ex)
             {
-                Log?.WriteFatalErrorAsync(nameof(Startup), nameof(ConfigureServices), "", ex).GetAwaiter().GetResult();
+                Log?.WriteFatalError(nameof(Startup), nameof(ConfigureServices), ex);
                 throw;
             }
         }
@@ -106,7 +106,7 @@ namespace Lykke.Job.TradelogBridge
 
                 appLifetime.ApplicationStarted.Register(() => StartApplication().GetAwaiter().GetResult());
                 appLifetime.ApplicationStopping.Register(() => StopApplication().GetAwaiter().GetResult());
-                appLifetime.ApplicationStopped.Register(() => CleanUp().GetAwaiter().GetResult());
+                appLifetime.ApplicationStopped.Register(() => CleanUp());
             }
             catch (Exception ex)
             {
@@ -122,11 +122,11 @@ namespace Lykke.Job.TradelogBridge
                 // NOTE: Job not yet recieve and process IsAlive requests here
 
                 await ApplicationContainer.Resolve<IStartupManager>().StartAsync();
-                await Log.WriteMonitorAsync("", Program.EnvInfo, "Started");
+                Log.WriteMonitor("", Program.EnvInfo, "Started");
             }
             catch (Exception ex)
             {
-                await Log.WriteFatalErrorAsync(nameof(Startup), nameof(StartApplication), "", ex);
+                Log.WriteFatalError(nameof(Startup), nameof(StartApplication), ex);
                 throw;
             }
         }
@@ -141,27 +141,25 @@ namespace Lykke.Job.TradelogBridge
             catch (Exception ex)
             {
                 if (Log != null)
-                {
-                    await Log.WriteFatalErrorAsync(nameof(Startup), nameof(StopApplication), "", ex);
-                }
+                    Log.WriteFatalError(nameof(Startup), nameof(StopApplication), ex);
                 throw;
             }
         }
 
-        private async Task CleanUp()
+        private void CleanUp()
         {
             try
             {
                 // NOTE: Job can't recieve and process IsAlive requests here, so you can destroy all resources
                 if (Log != null)
-                    await Log.WriteMonitorAsync("", Program.EnvInfo, "Terminating");
+                    Log.WriteMonitor("", Program.EnvInfo, "Terminating");
                 ApplicationContainer.Dispose();
             }
             catch (Exception ex)
             {
                 if (Log != null)
                 {
-                    await Log.WriteFatalErrorAsync(nameof(Startup), nameof(CleanUp), "", ex);
+                    Log.WriteFatalError(nameof(Startup), nameof(CleanUp), ex);
                     (Log as IDisposable)?.Dispose();
                 }
                 throw;

@@ -5,6 +5,7 @@ namespace Lykke.Job.TradelogBridge.Settings
     public class AppSettings
     {
         public TradelogBridgeSettings TradelogBridgeJob { get; set; }
+
         public SlackNotificationsSettings SlackNotifications { get; set; }
     }
 
