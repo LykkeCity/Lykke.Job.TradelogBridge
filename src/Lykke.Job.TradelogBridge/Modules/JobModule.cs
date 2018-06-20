@@ -1,32 +1,34 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Autofac;
+using Common;
 using Common.Log;
 using AzureStorage.Blob;
 using Lykke.Common;
 using Lykke.SettingsReader;
+using Lykke.Service.ClientAccount.Client;
 using Lykke.Service.DataBridge.Data;
-using Lykke.Job.TradesConverter.Contract;
 using Lykke.Job.TradelogBridge.Core.Services;
 using Lykke.Job.TradelogBridge.Services;
 using Lykke.Job.TradelogBridge.Sql;
+using Lykke.Job.TradelogBridge.Sql.Models;
 using Lykke.Job.TradelogBridge.Settings;
 
 namespace Lykke.Job.TradelogBridge.Modules
 {
     public class JobModule : Module
     {
-        private readonly TradelogBridgeSettings _settings;
-        private readonly IReloadingManager<TradelogBridgeSettings> _settingsManager;
+        private readonly AppSettings _appSettings;
+        private readonly IReloadingManager<AppSettings> _settingsManager;
         private readonly IConsole _console;
         private readonly ILog _log;
 
         public JobModule(
-            IReloadingManager<TradelogBridgeSettings> settingsManager,
+            IReloadingManager<AppSettings> settingsManager,
             IConsole console,
             ILog log)
         {
-            _settings = settingsManager.CurrentValue;
+            _appSettings = settingsManager.CurrentValue;
             _settingsManager = settingsManager;
             _console = console;
             _log = log;
@@ -35,7 +37,7 @@ namespace Lykke.Job.TradelogBridge.Modules
         protected override void Load(ContainerBuilder builder)
         {
             var dbContextFactory = new DbContextExtFactory();
-            using (var context = dbContextFactory.CreateInstance(_settings.SqlConnString))
+            using (var context = dbContextFactory.CreateInstance(_appSettings.TradelogBridgeJob.SqlConnString))
             {
                 context.Database.SetCommandTimeout(TimeSpan.FromMinutes(15));
                 context.Database.Migrate();
@@ -49,12 +51,17 @@ namespace Lykke.Job.TradelogBridge.Modules
                 .As<IConsole>()
                 .SingleInstance();
 
+            builder.RegisterInstance(_console)
+                .As<IConsole>()
+                .SingleInstance();
+
             builder.RegisterType<HealthService>()
                 .As<IHealthService>()
                 .SingleInstance();
 
             builder.RegisterType<StartupManager>()
-                .As<IStartupManager>();
+                .As<IStartupManager>()
+                .SingleInstance();
 
             builder.RegisterResourcesMonitoring(_log);
 
@@ -63,40 +70,54 @@ namespace Lykke.Job.TradelogBridge.Modules
                 .As<IShutdownManager>()
                 .SingleInstance();
 
-            var blobStorage = AzureBlobStorage.Create(_settingsManager.ConnectionString(i => i.BlobStorageConnString));
+            builder.RegisterLykkeServiceClient(_appSettings.ClientAccountServiceClient.ServiceUrl);
 
-            var repository = new DataRepository<TradeLogItem, DataContext>(
-                _settings.SqlConnString,
-                _settings.Rabbit.ExchangeName,
-                _settings.MaxBatchCount,
+            var blobStorage = AzureBlobStorage.Create(_settingsManager.ConnectionString(i => i.TradelogBridgeJob.BlobStorageConnString));
+
+            var settings = _appSettings.TradelogBridgeJob;
+
+            var tradesRepository = new DataRepository<TradesConverter.Contract.TradeLogItem, DataContext>(
+                settings.SqlConnString,
+                settings.MaxBatchCount,
                 blobStorage,
                 blobsCheckPeriodInSeconds: 3,
                 warningPeriodInMinutes: 10,
-                warningSqlTableSizeInGigabytes: _settings.WarningSqlTableSizeInGigabytes,
-                batchPeriodInMilliseconds: _settings.BatchPeriodInSeconds * 1000,
+                warningSqlTableSizeInGigabytes: settings.WarningSqlTableSizeInGigabytes,
+                batchPeriodInMilliseconds: settings.BatchPeriodInSeconds * 1000,
                 log: _log,
                 dbContextFatory: new DbContextExtFactory(),
                 entityMapper: new DbEntityMapper(),
                 notIdentifiableItemsProcessor: new TradesProcessor());
             builder
-                .RegisterInstance(repository)
+                .RegisterInstance(tradesRepository)
                 .As<IStartable>()
                 .AutoActivate()
                 .SingleInstance();
 
-            var subscriber = new TradelogSubscriber(
-                _settings.Rabbit.ConnectionString,
-                _settings.Rabbit.ExchangeName,
-                repository,
-                _console,
-                _log);
-
-            builder.RegisterInstance(subscriber)
+            var walletsRepository = new DataRepository<Wallet, DataContext>(
+                settings.SqlConnString,
+                settings.MaxBatchCount,
+                blobStorage,
+                blobsCheckPeriodInSeconds: 3,
+                warningPeriodInMinutes: 10,
+                warningSqlTableSizeInGigabytes: settings.WarningSqlTableSizeInGigabytes,
+                batchPeriodInMilliseconds: settings.BatchPeriodInSeconds * 1000,
+                log: _log,
+                dbContextFatory: new DbContextExtFactory());
+            builder
+                .RegisterInstance(walletsRepository)
                 .As<IStartable>()
                 .AutoActivate()
                 .SingleInstance();
 
-            shutdownManager.AddStopSequence(subscriber, repository);
+            builder.RegisterType<TradelogSubscriber>()
+                .As<IStopable>()
+                .AutoActivate()
+                .SingleInstance()
+                .WithParameter("connectionString", settings.Rabbit.ConnectionString)
+                .WithParameter("exchangeName", settings.Rabbit.ExchangeName)
+                .WithParameter("tradesRepository", tradesRepository)
+                .WithParameter("walletsRepository", walletsRepository);
         }
     }
 }

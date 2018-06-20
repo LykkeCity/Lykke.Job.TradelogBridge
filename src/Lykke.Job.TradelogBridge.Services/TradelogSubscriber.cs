@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Autofac;
@@ -6,8 +7,11 @@ using Common;
 using Common.Log;
 using Lykke.RabbitMqBroker;
 using Lykke.RabbitMqBroker.Subscriber;
+using Lykke.Service.ClientAccount.Client;
 using Lykke.Service.DataBridge.Data.Abstractions;
-using Lykke.Job.TradesConverter.Contract;
+using Lykke.Job.TradelogBridge.Core.Services;
+using Lykke.Job.TradelogBridge.Sql.Models;
+using TradeLogItem = Lykke.Job.TradesConverter.Contract.TradeLogItem;
 
 namespace Lykke.Job.TradelogBridge.Services
 {
@@ -15,7 +19,9 @@ namespace Lykke.Job.TradelogBridge.Services
     {
         private readonly ILog _log;
         private readonly IConsole _console;
-        private readonly IDataRepository _dataRepository;
+        private readonly IClientAccountClient _clientAccountClient;
+        private readonly IDataRepository _tradesRepository;
+        private readonly IDataRepository _walletsRepository;
         private readonly string _connectionString;
         private readonly string _exchangeName;
         private RabbitMqSubscriber<List<TradeLogItem>> _subscriber;
@@ -23,15 +29,25 @@ namespace Lykke.Job.TradelogBridge.Services
         public TradelogSubscriber(
             string connectionString,
             string exchangeName,
-            IDataRepository dataRepository,
+            IDataRepository tradesRepository,
+            IDataRepository walletsRepository,
+            IStartupManager startupManager,
+            IShutdownManager shutdownManager,
+            IClientAccountClient clientAccountClient,
             IConsole console,
             ILog log)
         {
             _connectionString = connectionString;
             _exchangeName = exchangeName;
-            _dataRepository = dataRepository;
+            _tradesRepository = tradesRepository;
+            _walletsRepository = walletsRepository;
+            _clientAccountClient = clientAccountClient;
             _console = console;
             _log = log;
+
+            startupManager.Register(this);
+
+            shutdownManager.AddStopSequence(this, _tradesRepository, _walletsRepository);
         }
 
         public void Start()
@@ -57,7 +73,30 @@ namespace Lykke.Job.TradelogBridge.Services
         {
             try
             {
-                await _dataRepository.AddDataItemsAsync(arg);
+                await _tradesRepository.AddDataItemsAsync(arg);
+
+                var walletsToUpdate = arg
+                    .Where(i => i.UserId != i.WalletId)
+                    .Select(i => i.WalletId)
+                    .Distinct()
+                    .ToList();
+
+                foreach (var walletId in walletsToUpdate)
+                {
+                    var wallet = await _clientAccountClient.GetWalletAsync(walletId);
+                    if (wallet == null)
+                        continue;
+
+                    await _walletsRepository.AddDataItemAsync(
+                        new Wallet
+                        {
+                            Id = wallet.Id,
+                            Type = wallet.Type,
+                            Name = wallet.Name,
+                            Owner = wallet.Owner,
+                            UserId = wallet.ClientId,
+                        });
+                }
             }
             catch (Exception exc)
             {
@@ -72,7 +111,7 @@ namespace Lykke.Job.TradelogBridge.Services
 
         public void Stop()
         {
-            _subscriber.Stop();
+            _subscriber?.Stop();
         }
     }
 }

@@ -9,8 +9,10 @@ namespace Lykke.Job.TradelogBridge.Sql
     public class DataContext : DbContextExt
     {
         internal const string TradesTable = "Trades";
+        internal const string WalletsTable = "Wallets";
 
         public virtual DbSet<TradeLogItem> Trades { get; set; }
+        public virtual DbSet<Wallet> Wallets { get; set; }
 
         public DataContext()
             : base(new DbContextOptionsBuilder<DataContext>().Options)
@@ -63,6 +65,17 @@ namespace Lykke.Job.TradelogBridge.Sql
                 entity.Property(e => e.SizeType).IsRequired().HasColumnType($"varchar({ TradeLogItemFee.MaxStringFieldsLength})");
                 entity.Property(e => e.Size).HasColumnType("decimal(18,8)");
                 entity.ToTable("FeeTradeLogItem");
+            });
+
+            modelBuilder.Entity<Wallet>(entity =>
+            {
+                entity.Property(e => e.Id).IsRequired().HasColumnType($"varchar({ Wallet.MaxStringFieldsLength})");
+                entity.Property(e => e.Type).IsRequired().HasColumnType($"varchar({ Wallet.MaxStringFieldsLength})");
+                entity.Property(e => e.Name).IsRequired().HasColumnType($"varchar({ Wallet.MaxStringFieldsLength})");
+                entity.Property(e => e.Owner).IsRequired().HasColumnType($"varchar({ Wallet.MaxStringFieldsLength})");
+                entity.Property(e => e.UserId).IsRequired().HasColumnType($"varchar({ Wallet.MaxStringFieldsLength})");
+                entity.HasKey(e => e.Id);
+                entity.ToTable(WalletsTable);
             });
 
             base.OnModelCreating(modelBuilder);

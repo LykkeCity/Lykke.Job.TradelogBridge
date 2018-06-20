@@ -37,7 +37,9 @@ namespace Lykke.Job.TradelogBridge.Sql
             if (!_dict.ContainsKey(item.TradeId))
             {
                 var query = $"SELECT * FROM dbo.{DataContext.TradesTable} WHERE TradeId = '{item.TradeId}'";
+#pragma warning disable EF1000 // Possible SQL injection vulnerability.
                 var items = dbContext.Trades.FromSql(query).AsNoTracking().ToList();
+#pragma warning restore EF1000 // Possible SQL injection vulnerability.
                 _dict[item.TradeId] = items;
             }
             var fromDb = _dict[item.TradeId].FirstOrDefault(c =>

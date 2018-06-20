@@ -1,4 +1,5 @@
 ﻿using Lykke.SettingsReader.Attributes;
+using Lykke.Service.ClientAccount.Client;
 
 namespace Lykke.Job.TradelogBridge.Settings
 {
@@ -7,6 +8,8 @@ namespace Lykke.Job.TradelogBridge.Settings
         public TradelogBridgeSettings TradelogBridgeJob { get; set; }
 
         public SlackNotificationsSettings SlackNotifications { get; set; }
+
+        public ClientAccountServiceClientSettings ClientAccountServiceClient { get; set; }
     }
 
     public class TradelogBridgeSettings

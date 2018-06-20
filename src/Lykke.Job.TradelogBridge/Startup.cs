@@ -64,7 +64,7 @@ namespace Lykke.Job.TradelogBridge
 
                 builder.RegisterModule(
                     new JobModule(
-                        appSettings.Nested(x => x.TradelogBridgeJob),
+                        appSettings,
                         _console,
                         Log));
 
@@ -110,7 +110,7 @@ namespace Lykke.Job.TradelogBridge
             }
             catch (Exception ex)
             {
-                Log?.WriteFatalErrorAsync(nameof(Startup), nameof(Configure), "", ex).GetAwaiter().GetResult();
+                Log?.WriteFatalError(nameof(Startup), nameof(Configure), ex);
                 throw;
             }
         }
@@ -178,7 +178,7 @@ namespace Lykke.Job.TradelogBridge
 
             if (string.IsNullOrEmpty(dbLogConnectionString))
             {
-                _console.WriteWarningAsync(nameof(Startup), nameof(CreateLogWithSlack), "Table loggger is not inited").GetAwaiter().GetResult();
+                _console.WriteWarning(nameof(Startup), nameof(CreateLogWithSlack), "Table loggger is not inited");
                 return aggregateLogger;
             }
 
