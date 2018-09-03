@@ -6,9 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Lykke.Service.DataBridge.Data" Version="5.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.1.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.1.1" />
+    <PackageReference Include="Dapper" Version="1.50.5" />
+    <PackageReference Include="Lykke.Service.DataBridge.Data" Version="6.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.1.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.1.2" />
   </ItemGroup>
 
   <PropertyGroup>

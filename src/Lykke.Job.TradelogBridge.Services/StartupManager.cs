@@ -11,6 +11,11 @@ namespace Lykke.Job.TradelogBridge.Services
     {
         private readonly List<IStartable> _startables = new List<IStartable>();
 
+        public StartupManager(IEnumerable<IStartStop> startables)
+        {
+            _startables.AddRange(startables);
+        }
+
         public Task StartAsync()
         {
             foreach (var startable in _startables)
@@ -19,11 +24,6 @@ namespace Lykke.Job.TradelogBridge.Services
             }
 
             return Task.CompletedTask;
-        }
-
-        public void Register(IStartable startable)
-        {
-            _startables.Add(startable);
         }
     }
 }

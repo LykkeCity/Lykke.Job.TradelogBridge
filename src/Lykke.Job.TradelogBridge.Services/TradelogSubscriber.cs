@@ -2,8 +2,6 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Autofac;
-using Common;
 using Common.Log;
 using Lykke.RabbitMqBroker;
 using Lykke.RabbitMqBroker.Subscriber;
@@ -15,7 +13,7 @@ using TradeLogItem = Lykke.Job.TradesConverter.Contract.TradeLogItem;
 
 namespace Lykke.Job.TradelogBridge.Services
 {
-    public class TradelogSubscriber : IStartable, IStopable
+    public class TradelogSubscriber : IStartStop
     {
         private readonly ILog _log;
         private readonly IConsole _console;
@@ -31,8 +29,6 @@ namespace Lykke.Job.TradelogBridge.Services
             string exchangeName,
             IDataRepository tradesRepository,
             IDataRepository walletsRepository,
-            IStartupManager startupManager,
-            IShutdownManager shutdownManager,
             IClientAccountClient clientAccountClient,
             IConsole console,
             ILog log)
@@ -44,10 +40,6 @@ namespace Lykke.Job.TradelogBridge.Services
             _clientAccountClient = clientAccountClient;
             _console = console;
             _log = log;
-
-            startupManager.Register(this);
-
-            shutdownManager.AddStopSequence(this, _tradesRepository, _walletsRepository);
         }
 
         public void Start()

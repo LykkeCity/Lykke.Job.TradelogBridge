@@ -1,24 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using AzureStorage.Tables;
 using Common.Log;
+using Lykke.Common;
+using Lykke.Common.Api.Contract.Responses;
+using Lykke.Common.ApiLibrary.Middleware;
+using Lykke.Common.ApiLibrary.Swagger;
+using Lykke.Job.TradelogBridge.Core.Services;
+using Lykke.Job.TradelogBridge.Modules;
+using Lykke.Job.TradelogBridge.Settings;
 using Lykke.Logs;
 using Lykke.Logs.Slack;
 using Lykke.SettingsReader;
 using Lykke.SlackNotification.AzureQueue;
-using Lykke.Common.ApiLibrary.Middleware;
-using Lykke.Common.ApiLibrary.Swagger;
-using Lykke.Common.Api.Contract.Responses;
-using Lykke.Job.TradelogBridge.Core.Services;
-using Lykke.Job.TradelogBridge.Modules;
-using Lykke.Job.TradelogBridge.Settings;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Lykke.Job.TradelogBridge
 {
@@ -58,7 +59,12 @@ namespace Lykke.Job.TradelogBridge
                 });
 
                 var builder = new ContainerBuilder();
-                var appSettings = Configuration.LoadSettings<AppSettings>();
+                var appSettings = Configuration.LoadSettings<AppSettings>(o =>
+                {
+                    o.SetConnString(s => s.SlackNotifications.AzureQueue.ConnectionString);
+                    o.SetQueueName(s => s.SlackNotifications.AzureQueue.QueueName);
+                    o.SenderName = $"{AppEnvironment.Name} {AppEnvironment.Version}";
+                });
 
                 Log = CreateLogWithSlack(services, appSettings);
 

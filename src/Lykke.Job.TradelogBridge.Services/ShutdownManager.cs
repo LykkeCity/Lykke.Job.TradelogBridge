@@ -7,23 +7,20 @@ namespace Lykke.Job.TradelogBridge.Services
 {
     public class ShutdownManager : IShutdownManager
     {
-        private readonly List<ICollection<IStopable>> _stopSequences = new List<ICollection<IStopable>>();
+        private readonly List<IStartStop> _startStops = new List<IStartStop>();
+        private readonly List<IStopable> _stopables = new List<IStopable>();
+
+        public ShutdownManager(IEnumerable<IStartStop> startStops, IEnumerable<IStopable> stopables)
+        {
+            _startStops.AddRange(startStops);
+            _stopables.AddRange(stopables);
+        }
 
         public Task StopAsync()
         {
-            foreach (var stopSequence in _stopSequences)
-            {
-                foreach (var item in stopSequence)
-                {
-                    item.Stop();
-                }
-            }
+            Parallel.ForEach(_startStops, i => i.Stop());
+            Parallel.ForEach(_stopables, i => i.Stop());
             return Task.CompletedTask;
-        }
-
-        public void AddStopSequence(params IStopable[] stopSequence)
-        {
-            _stopSequences.Add(stopSequence);
         }
     }
 }

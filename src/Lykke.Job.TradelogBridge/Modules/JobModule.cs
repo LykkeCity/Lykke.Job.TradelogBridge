@@ -1,18 +1,18 @@
 ﻿using System;
-using Microsoft.EntityFrameworkCore;
 using Autofac;
+using AzureStorage.Blob;
 using Common;
 using Common.Log;
-using AzureStorage.Blob;
 using Lykke.Common;
-using Lykke.SettingsReader;
-using Lykke.Service.ClientAccount.Client;
-using Lykke.Service.DataBridge.Data;
 using Lykke.Job.TradelogBridge.Core.Services;
 using Lykke.Job.TradelogBridge.Services;
+using Lykke.Job.TradelogBridge.Settings;
 using Lykke.Job.TradelogBridge.Sql;
 using Lykke.Job.TradelogBridge.Sql.Models;
-using Lykke.Job.TradelogBridge.Settings;
+using Lykke.Service.ClientAccount.Client;
+using Lykke.Service.DataBridge.Data;
+using Lykke.SettingsReader;
+using Microsoft.EntityFrameworkCore;
 
 namespace Lykke.Job.TradelogBridge.Modules
 {
@@ -63,12 +63,12 @@ namespace Lykke.Job.TradelogBridge.Modules
                 .As<IStartupManager>()
                 .SingleInstance();
 
-            builder.RegisterResourcesMonitoring(_log);
-
-            var shutdownManager = new ShutdownManager();
-            builder.RegisterInstance(shutdownManager)
+            builder.RegisterType<ShutdownManager>()
                 .As<IShutdownManager>()
+                .AutoActivate()
                 .SingleInstance();
+
+            builder.RegisterResourcesMonitoring(_log);
 
             builder.RegisterLykkeServiceClient(_appSettings.ClientAccountServiceClient.ServiceUrl);
 
@@ -91,7 +91,7 @@ namespace Lykke.Job.TradelogBridge.Modules
             builder
                 .RegisterInstance(tradesRepository)
                 .As<IStartable>()
-                .AutoActivate()
+                .As<IStopable>()
                 .SingleInstance();
 
             var walletsRepository = new DataRepository<Wallet, DataContext>(
@@ -107,12 +107,11 @@ namespace Lykke.Job.TradelogBridge.Modules
             builder
                 .RegisterInstance(walletsRepository)
                 .As<IStartable>()
-                .AutoActivate()
+                .As<IStopable>()
                 .SingleInstance();
 
             builder.RegisterType<TradelogSubscriber>()
-                .As<IStopable>()
-                .AutoActivate()
+                .As<IStartStop>()
                 .SingleInstance()
                 .WithParameter("connectionString", settings.Rabbit.ConnectionString)
                 .WithParameter("exchangeName", settings.Rabbit.ExchangeName)

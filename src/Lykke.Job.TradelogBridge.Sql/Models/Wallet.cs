@@ -1,11 +1,12 @@
-﻿using Lykke.Service.DataBridge.Data.Abstractions;
+﻿using Common.Log;
+using Lykke.Service.DataBridge.Data.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Lykke.Job.TradelogBridge.Sql.Models
 {
     public class Wallet : IDbIdentity
     {
-        public static int MaxStringFieldsLength { get { return 255; } }
+        public static int MaxStringFieldsLength => 255;
 
         public string Id { get; set; }
 
@@ -19,7 +20,7 @@ namespace Lykke.Job.TradelogBridge.Sql.Models
 
         public object DbId => Id;
 
-        public void Add(DbContext context)
+        public void Add(DbContext context, ILog log)
         {
             context.Add(this);
         }
@@ -28,7 +29,7 @@ namespace Lykke.Job.TradelogBridge.Sql.Models
         {
         }
 
-        public bool Update(object newVersion, DbContext context)
+        public bool Update(object newVersion)
         {
             return false;
         }
