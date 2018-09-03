@@ -39,7 +39,6 @@ namespace Lykke.Job.TradelogBridge.Modules
             var dbContextFactory = new DbContextExtFactory();
             using (var context = dbContextFactory.CreateInstance(_appSettings.TradelogBridgeJob.SqlConnString))
             {
-                context.Database.SetCommandTimeout(TimeSpan.FromMinutes(15));
                 context.Database.Migrate();
             }
 

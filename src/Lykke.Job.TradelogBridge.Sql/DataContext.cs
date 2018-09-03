@@ -17,11 +17,13 @@ namespace Lykke.Job.TradelogBridge.Sql
         public DataContext()
             : base(new DbContextOptionsBuilder<DataContext>().Options)
         {
+            Database.SetCommandTimeout(TimeSpan.FromMinutes(15));
         }
 
         public DataContext(DbContextOptions options)
             : base(options)
         {
+            Database.SetCommandTimeout(TimeSpan.FromMinutes(15));
         }
 
         public override List<string> GetTableNames(Type type)
