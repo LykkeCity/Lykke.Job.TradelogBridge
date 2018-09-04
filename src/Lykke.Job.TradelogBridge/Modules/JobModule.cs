@@ -50,10 +50,6 @@ namespace Lykke.Job.TradelogBridge.Modules
                 .As<IConsole>()
                 .SingleInstance();
 
-            builder.RegisterInstance(_console)
-                .As<IConsole>()
-                .SingleInstance();
-
             builder.RegisterType<HealthService>()
                 .As<IHealthService>()
                 .SingleInstance();
