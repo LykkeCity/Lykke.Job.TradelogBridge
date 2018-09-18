@@ -16,7 +16,6 @@ namespace Lykke.Job.TradelogBridge.Services
     public class TradelogSubscriber : IStartStop
     {
         private readonly ILog _log;
-        private readonly IConsole _console;
         private readonly IClientAccountClient _clientAccountClient;
         private readonly IDataRepository _tradesRepository;
         private readonly IDataRepository _walletsRepository;
@@ -30,7 +29,6 @@ namespace Lykke.Job.TradelogBridge.Services
             IDataRepository tradesRepository,
             IDataRepository walletsRepository,
             IClientAccountClient clientAccountClient,
-            IConsole console,
             ILog log)
         {
             _connectionString = connectionString;
@@ -38,7 +36,6 @@ namespace Lykke.Job.TradelogBridge.Services
             _tradesRepository = tradesRepository;
             _walletsRepository = walletsRepository;
             _clientAccountClient = clientAccountClient;
-            _console = console;
             _log = log;
         }
 
@@ -56,7 +53,6 @@ namespace Lykke.Job.TradelogBridge.Services
                 .SetMessageReadStrategy(new MessageReadQueueStrategy())
                 .Subscribe(ProcessMessageAsync)
                 .CreateDefaultBinding()
-                .SetConsole(_console)
                 .SetLogger(_log)
                 .Start();
         }

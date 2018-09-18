@@ -1,12 +1,13 @@
-﻿using System.Threading.Tasks;
-using Lykke.Service.DataBridge.Data.Abstractions;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Lykke.Job.TradelogBridge.Sql.Models;
+using Lykke.Service.DataBridge.Data.Abstractions;
 
 namespace Lykke.Job.TradelogBridge.Services
 {
     public class DbEntityMapper : IDbEntityMapper
     {
-        public Task<object> MapEntityAsync(object item)
+        public Task<List<object>> MapEntityAsync(object item)
         {
             if (item is TradesConverter.Contract.TradeLogItem model)
             {
@@ -43,7 +44,7 @@ namespace Lykke.Job.TradelogBridge.Services
                     };
                 item = converted;
             }
-            return Task.FromResult(item);
+            return Task.FromResult(new List<object>{item});
         }
     }
 }

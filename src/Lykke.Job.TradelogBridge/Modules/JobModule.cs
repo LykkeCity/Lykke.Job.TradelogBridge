@@ -1,5 +1,4 @@
-﻿using System;
-using Autofac;
+﻿using Autofac;
 using AzureStorage.Blob;
 using Common;
 using Common.Log;
@@ -20,17 +19,12 @@ namespace Lykke.Job.TradelogBridge.Modules
     {
         private readonly AppSettings _appSettings;
         private readonly IReloadingManager<AppSettings> _settingsManager;
-        private readonly IConsole _console;
         private readonly ILog _log;
 
-        public JobModule(
-            IReloadingManager<AppSettings> settingsManager,
-            IConsole console,
-            ILog log)
+        public JobModule(IReloadingManager<AppSettings> settingsManager, ILog log)
         {
             _appSettings = settingsManager.CurrentValue;
             _settingsManager = settingsManager;
-            _console = console;
             _log = log;
         }
 
@@ -44,10 +38,6 @@ namespace Lykke.Job.TradelogBridge.Modules
 
             builder.RegisterInstance(_log)
                 .As<ILog>()
-                .SingleInstance();
-
-            builder.RegisterInstance(_console)
-                .As<IConsole>()
                 .SingleInstance();
 
             builder.RegisterType<HealthService>()

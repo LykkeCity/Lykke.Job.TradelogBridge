@@ -25,8 +25,6 @@ namespace Lykke.Job.TradelogBridge
 {
     public class Startup
     {
-        private LogToConsole _console;
-
         public IHostingEnvironment Environment { get; }
         public IContainer ApplicationContainer { get; private set; }
         public IConfigurationRoot Configuration { get; }
@@ -68,11 +66,7 @@ namespace Lykke.Job.TradelogBridge
 
                 Log = CreateLogWithSlack(services, appSettings);
 
-                builder.RegisterModule(
-                    new JobModule(
-                        appSettings,
-                        _console,
-                        Log));
+                builder.RegisterModule(new JobModule(appSettings, Log));
 
                 builder.Populate(services);
 
@@ -141,6 +135,8 @@ namespace Lykke.Job.TradelogBridge
         {
             try
             {
+                Log?.WriteMonitor("", Program.EnvInfo, "Stopping");
+
                 // NOTE: Job still can recieve and process IsAlive requests here, so take care about it if you add logic here.
                 await ApplicationContainer.Resolve<IShutdownManager>().StopAsync();
             }
@@ -172,17 +168,17 @@ namespace Lykke.Job.TradelogBridge
 
         private ILog CreateLogWithSlack(IServiceCollection services, IReloadingManager<AppSettings> settings)
         {
-            _console = new LogToConsole();
+            var console = new LogToConsole();
             var aggregateLogger = new AggregateLogger();
 
-            aggregateLogger.AddLog(_console);
+            aggregateLogger.AddLog(console);
 
             var dbLogConnectionStringManager = settings.Nested(x => x.TradelogBridgeJob.LogsConnString);
             var dbLogConnectionString = dbLogConnectionStringManager.CurrentValue;
 
             if (string.IsNullOrEmpty(dbLogConnectionString))
             {
-                _console.WriteWarning(nameof(Startup), nameof(CreateLogWithSlack), "Table loggger is not inited");
+                console.WriteWarning(nameof(Startup), nameof(CreateLogWithSlack), "Table loggger is not inited");
                 return aggregateLogger;
             }
 
@@ -190,8 +186,8 @@ namespace Lykke.Job.TradelogBridge
                 throw new InvalidOperationException($"LogsConnString {dbLogConnectionString} is not filled in settings");
 
             var persistenceManager = new LykkeLogToAzureStoragePersistenceManager(
-                AzureTableStorage<LogEntity>.Create(dbLogConnectionStringManager, "TradelogBridgeLog", _console),
-                _console);
+                AzureTableStorage<LogEntity>.Create(dbLogConnectionStringManager, "TradelogBridgeLog", console),
+                console);
 
             // Creating slack notification service, which logs own azure queue processing messages to aggregate log
             var slackService = services.UseSlackNotificationsSenderViaAzureQueue(new AzureQueueIntegration.AzureQueueSettings
@@ -203,13 +199,13 @@ namespace Lykke.Job.TradelogBridge
             var slackNotificationsManager = new LykkeLogToAzureSlackNotificationsManager(
                 slackService,
                 new HashSet<string> { LykkeLogToAzureStorage.ErrorType, LykkeLogToAzureStorage.FatalErrorType, LykkeLogToAzureStorage.MonitorType },
-                _console);
+                console);
 
             // Creating azure storage logger, which logs own messages to concole log
             var azureStorageLogger = new LykkeLogToAzureStorage(
                 persistenceManager,
                 slackNotificationsManager,
-                _console);
+                console);
 
             azureStorageLogger.Start();
 
