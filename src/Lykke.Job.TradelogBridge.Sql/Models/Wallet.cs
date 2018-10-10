@@ -29,9 +29,8 @@ namespace Lykke.Job.TradelogBridge.Sql.Models
         {
         }
 
-        public bool Update(object newVersion)
+        public void Update(object newVersion, DbContext context)
         {
-            return false;
         }
     }
 }

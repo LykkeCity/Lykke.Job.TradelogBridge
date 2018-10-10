@@ -67,12 +67,12 @@ namespace Lykke.Job.TradelogBridge.Modules
                 blobStorage,
                 blobsCheckPeriodInSeconds: 3,
                 warningPeriodInMinutes: 10,
-                warningSqlTableSizeInGigabytes: settings.WarningSqlTableSizeInGigabytes,
-                batchPeriodInMilliseconds: settings.BatchPeriodInSeconds * 1000,
-                log: _log,
-                dbContextFatory: new DbContextExtFactory(),
-                entityMapper: new DbEntityMapper(),
-                notIdentifiableItemsProcessor: new TradesProcessor());
+                settings.WarningSqlTableSizeInGigabytes,
+                settings.BatchPeriodInSeconds * 1000,
+                _log,
+                new DbContextExtFactory(),
+                new DbEntityMapper(),
+                new TradesProcessor());
             builder
                 .RegisterInstance(tradesRepository)
                 .As<IStartable>()
@@ -85,10 +85,10 @@ namespace Lykke.Job.TradelogBridge.Modules
                 blobStorage,
                 blobsCheckPeriodInSeconds: 3,
                 warningPeriodInMinutes: 10,
-                warningSqlTableSizeInGigabytes: settings.WarningSqlTableSizeInGigabytes,
-                batchPeriodInMilliseconds: settings.BatchPeriodInSeconds * 1000,
-                log: _log,
-                dbContextFatory: new DbContextExtFactory());
+                settings.WarningSqlTableSizeInGigabytes,
+                settings.BatchPeriodInSeconds * 1000,
+                _log,
+                new DbContextExtFactory());
             builder
                 .RegisterInstance(walletsRepository)
                 .As<IStartable>()

@@ -4,7 +4,7 @@ namespace Lykke.Job.TradelogBridge.Sql.Models
 {
     public class TradeLogItem
     {
-        public static int MaxStringFieldsLength { get { return 255; } }
+        public static int MaxStringFieldsLength => 255;
 
         public long Id { get; set; }
 

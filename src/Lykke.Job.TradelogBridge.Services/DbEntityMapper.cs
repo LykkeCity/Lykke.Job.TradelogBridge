@@ -14,7 +14,7 @@ namespace Lykke.Job.TradelogBridge.Services
                 var converted = new TradeLogItem
                 {
                     TradeId = model.TradeId,
-                    UserId = model.UserId, //model.HashedUserId,
+                    UserId = model.UserId,
                     WalletId = model.WalletId,
                     Direction = model.Direction.ToString(),
                     OrderType = model.OrderType,
