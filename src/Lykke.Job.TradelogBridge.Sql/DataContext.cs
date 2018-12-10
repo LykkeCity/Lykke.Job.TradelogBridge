@@ -51,6 +51,9 @@ namespace Lykke.Job.TradelogBridge.Sql
                 entity.Property(e => e.OppositeVolume).HasColumnType("decimal(18,8)");
                 entity.Property(e => e.IsHidden).HasColumnType("bit");
                 entity.HasOne(e => e.Fee).WithOne().HasForeignKey<TradeLogItemFee>(i => i.TradeLogItemId);
+                entity.HasIndex(e => e.TradeId);
+                entity.HasIndex(e => e.OrderId);
+                entity.HasIndex(e => e.DateTime);
                 entity.ToTable(TradesTable);
             });
 
